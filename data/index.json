@@ -6,5 +6,13 @@
   "snapshots": 1,
   "lastTvl": 35506.842801,
   "lastPnl": -16789.682537
+ },
+ {
+  "address": "0xe09e6c33b444d246f1005bdcd404ff33cb709eca",
+  "first": "2026-08-04",
+  "last": "2026-08-04",
+  "snapshots": 1,
+  "lastTvl": 2144.587006,
+  "lastPnl": 387.031819
  }
 ]

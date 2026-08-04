@@ -90,6 +90,15 @@ tr:hover td{background:#16162233}
 .r-high{color:var(--red);background:#f0406014}
 .empty{color:var(--muted);font-size:12.5px;padding:18px;text-align:center}
 .warnbox{background:#f0c04014;border:1px solid #f0c04044;color:var(--yellow);border-radius:12px;padding:10px 14px;font-size:12px;margin-top:14px;display:none}
+/* donation strip */
+.donate{margin-top:26px;background:linear-gradient(135deg,#00d4aa14,#4a9eff14);border:1px solid #00d4aa33;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.donate .di{display:flex;align-items:center;gap:12px;flex:1;min-width:260px}
+.donate .di b{font-size:13.5px}
+.donate .di .sub{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.5}
+.donate-addr{font-family:var(--mono);font-size:12px;background:var(--surface);border:1px solid var(--border);padding:8px 12px;border-radius:9px;color:var(--green);word-break:break-all}
+.donate button{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:11.5px;font-weight:700;padding:8px 14px;border-radius:9px;cursor:pointer}
+.donate button:hover{border-color:var(--green);color:var(--green)}
+@media(max-width:640px){.donate-addr{width:100%}}
 footer{margin-top:34px;color:var(--muted);font-size:11.5px;line-height:1.7;border-top:1px solid var(--border);padding-top:14px}
 footer a{color:var(--blue);text-decoration:none}
 a{color:var(--blue);text-decoration:none}
@@ -156,6 +165,18 @@ a:hover{text-decoration:underline}
 
   <div class="warnbox" id="warnbox"><!--__WARN__--></div>
 
+  <div class="donate">
+    <div class="di">
+      <span style="font-size:22px">💜</span>
+      <div>
+        <b>Support this dashboard</b>
+        <div class="sub">Built and maintained independently — donations keep it free, updated and ad-free. Any chain, any token:</div>
+      </div>
+    </div>
+    <code class="donate-addr" id="donateAddr">0xe09e6c33b444d246F1005BdCd404ff33Cb709EcA</code>
+    <button id="donateCopy" onclick="copyDonate()">Copy address</button>
+  </div>
+
   <footer>
     Data: <a href="https://api.krystal.app">api.krystal.app</a> — LP positions via <code>/all/v2/lp/userPositions</code> (all chains),
     vault holdings via <code>/all/v1/vaults/profile</code>. PnL figures are cumulative and gross. Direct LP and vault shares are
@@ -184,6 +205,17 @@ function banner(msg,ok){
   const b=$('banner'); b.textContent=msg; b.className='banner'+(ok?' ok':''); b.style.display='block';
 }
 function clearBanner(){ const b=$('banner'); b.style.display='none'; }
+
+function copyDonate(){
+  const addr=$('donateAddr').textContent;
+  const done=()=>{const b=$('donateCopy');b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy address',1600);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(addr).then(done).catch(()=>fallbackCopy(addr,done));}
+  else{fallbackCopy(addr,done);}
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);
+}
 
 /* ===== charts (from history series) ===== */
 function drawChart(canvas,series,opts){

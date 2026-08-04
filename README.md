@@ -70,6 +70,15 @@ wallets, so history is built from daily snapshots).
 - `config.json` — default wallet, chain list, history cap
 - `data/` — per-wallet snapshot history + tracked-wallet manifest
 
+## Donations
+
+This dashboard is built and maintained independently. If it saves you time or
+money, please consider supporting the work — any chain, any token:
+
+**`0xe09e6c33b444d246F1005BdCd404ff33Cb709EcA`**
+
+Donations keep the project free, updated and ad-free. Thank you 🙏
+
 ## License
 
 MIT — see [LICENSE](LICENSE). Not financial advice.
