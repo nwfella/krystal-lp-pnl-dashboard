@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krystal LP PnL Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0f'/%3E%3Cpath d='M16 5c-6 7-9 11.2-9 15a9 9 0 0 0 18 0c0-3.8-3-8-9-15z' fill='%2300d4aa'/%3E%3Ccircle cx='16' cy='20' r='3' fill='%230a0a0f'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0a0a0f; --surface:#12121a; --surface2:#161622; --border:#1e1e2e;
+  --text:#e2e2f0; --muted:#8888a0; --green:#00d4aa; --yellow:#f0c040; --red:#f04060;
+  --blue:#4a9eff; --purple:#a78bfa; --mono:'Cascadia Code','JetBrains Mono',Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 18px 60px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#00d4aa22,#4a9eff22);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px}
+.titles h1{font-size:21px;font-weight:700;letter-spacing:.2px}
+.titles .sub{color:var(--muted);font-size:12.5px;margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.badge{font-size:10px;font-weight:700;letter-spacing:.8px;padding:3px 8px;border-radius:20px;border:1px solid var(--border);color:var(--green)}
+.badge.warn{color:var(--yellow)}
+.addr{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.right{margin-left:auto;text-align:right}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2s infinite}
+.dot.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.updated{font-size:12px;color:var(--muted)}
+/* address bar */
+.abar{display:flex;gap:10px;margin:16px 0 0;flex-wrap:wrap;align-items:center}
+.abar input{flex:1;min-width:280px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;border-radius:10px;outline:none}
+.abar input:focus{border-color:var(--green)}
+.abar button{background:linear-gradient(135deg,#00d4aa,#009e80);border:none;color:#04231c;font-weight:700;font-size:13px;padding:10px 20px;border-radius:10px;cursor:pointer}
+.abar button:disabled{opacity:.5;cursor:wait}
+.hint{font-size:11.5px;color:var(--muted);margin-top:7px;line-height:1.6}
+.banner{display:none;background:#f0406014;border:1px solid #f0406044;color:#ff8ba0;border-radius:12px;padding:10px 14px;font-size:12px;margin-top:12px}
+.banner.ok{background:#00d4aa14;border-color:#00d4aa44;color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin-top:18px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+.card .label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.card .label img{width:14px;height:14px;border-radius:50%}
+.card .val{font-size:22px;font-weight:700;margin-top:6px;font-family:var(--mono)}
+.card .delta{font-size:11.5px;margin-top:3px;color:var(--muted)}
+.up{color:var(--green)} .down{color:var(--red)} .flat{color:var(--muted)}
+.accent{position:absolute;top:0;left:0;right:0;height:2px}
+.accent.g{background:var(--green)} .accent.b{background:var(--blue)} .accent.y{background:var(--yellow)} .accent.p{background:var(--purple)} .accent.r{background:var(--red)}
+h2.section{font-size:14px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:30px 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h2.section .count{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:0}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.chart-card h3{font-size:13px;color:var(--text);font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
+.chart-card h3 .cur{font-family:var(--mono);font-size:15px;font-weight:700}
+.chart-card canvas{width:100%;height:190px;display:block;margin-top:8px}
+@media(max-width:820px){.charts{grid-template-columns:1fr}}
+/* chain breakdown */
+.chains{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:12px}
+.chain-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 15px}
+.chain-head{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.chain-head img{width:22px;height:22px;border-radius:50%}
+.chain-name{font-size:13.5px;font-weight:700}
+.chain-sub{font-size:11px;color:var(--muted)}
+.chain-val{margin-left:auto;font-family:var(--mono);font-size:15px;font-weight:700}
+.chain-row{display:flex;justify-content:space-between;font-size:12px;padding:3.5px 0;font-family:var(--mono);border-bottom:1px dashed #1c1c2a}
+.chain-row:last-of-type{border-bottom:none}
+.chain-row .k{color:var(--muted)}
+.chain-prots{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.chip{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--muted)}
+.chip-v{color:var(--purple);border-color:#a78bfa44}
+/* filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.filters select,.filters input{background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:12px;padding:7px 10px;border-radius:9px;outline:none;font-family:var(--mono)}
+.filters input{flex:1;min-width:180px}
+.filters select:focus,.filters input:focus{border-color:var(--green)}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:auto;max-height:460px}
+table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono)}
+th{position:sticky;top:0;background:var(--surface2);text-align:right;padding:9px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 12px;text-align:right;border-bottom:1px solid #17171f;color:var(--text);white-space:nowrap}
+td:first-child,th:first-child{text-align:left}
+tr:hover td{background:#16162233}
+.pair{display:flex;align-items:center;gap:7px}
+.pair .logos{display:flex}
+.pair .logos img{width:17px;height:17px;border-radius:50%;margin-right:-5px;border:2px solid var(--surface)}
+.pair .logos img:last-child{margin-right:0}
+.st-in{color:var(--green)} .st-out{color:var(--yellow)}
+.vname{font-weight:600;color:var(--text)}
+.vsub{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.risk{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.r-low{color:var(--green);background:#00d4aa14}
+.r-mid{color:var(--yellow);background:#f0c04014}
+.r-high{color:var(--red);background:#f0406014}
+.empty{color:var(--muted);font-size:12.5px;padding:18px;text-align:center}
+.warnbox{background:#f0c04014;border:1px solid #f0c04044;color:var(--yellow);border-radius:12px;padding:10px 14px;font-size:12px;margin-top:14px;display:none}
+footer{margin-top:34px;color:var(--muted);font-size:11.5px;line-height:1.7;border-top:1px solid var(--border);padding-top:14px}
+footer a{color:var(--blue);text-decoration:none}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+@media(max-width:640px){.card .val{font-size:19px}h1{font-size:18px!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">💧</div>
+    <div class="titles">
+      <h1>Krystal LP PnL Dashboard</h1>
+      <div class="sub">
+        <span class="badge">KRYSTAL · ALL CHAINS</span>
+        <span class="badge" id="modeBadge">STATIC</span>
+        <span class="addr" id="walletAddr"><!--__WALLET__--></span>
+      </div>
+    </div>
+    <div class="right">
+      <div class="updated"><span class="dot" id="dot"></span><span id="updated"><!--__UPDATED__--></span></div>
+      <div class="updated" id="fetchLine" style="margin-top:4px"></div>
+    </div>
+  </header>
+
+  <div class="abar">
+    <input id="addrInput" list="trackedList" placeholder="0x…  enter any EVM wallet address" spellcheck="false">
+    <datalist id="trackedList"><!--__TRACKED__--></datalist>
+    <button id="loadBtn">Load</button>
+  </div>
+  <div class="hint">Any wallet address — pulls <b>all LP positions</b> Krystal tracks (Uniswap V2/V3/V4, PancakeSwap, THENA, Aerodrome, …) across every supported chain, plus your <b>Krystal vault shares</b>. Live mode fetches the API directly when the network allows; otherwise this page shows the latest statically-rendered snapshot (regenerated daily).</div>
+  <div class="banner" id="banner"></div>
+
+  <div class="grid" id="cards"><!--__CARDS__--></div>
+
+  <h2 class="section">Value &amp; PnL over time <span class="count" id="histCount"></span></h2>
+  <div class="charts">
+    <div class="chart-card"><h3>Combined TVL <span class="cur" id="cComb"><!--__CUR_COMB__--></span></h3><canvas id="chComb"></canvas></div>
+    <div class="chart-card"><h3>Combined PnL <span class="cur" id="cCombPnl"><!--__CUR_COMBPNL__--></span></h3><canvas id="chCombPnl"></canvas></div>
+    <div class="chart-card"><h3>Direct LP value <span class="cur" id="cLp"><!--__CUR_LP__--></span></h3><canvas id="chLp"></canvas></div>
+    <div class="chart-card"><h3>Vault share value <span class="cur" id="cVlt"><!--__CUR_VLT__--></span></h3><canvas id="chVlt"></canvas></div>
+  </div>
+
+  <h2 class="section">By chain</h2>
+  <div class="chains" id="chains"><!--__CHAINS__--></div>
+
+  <h2 class="section">Open LP positions <span class="count" id="posCount"></span></h2>
+  <div class="filters">
+    <select id="fChain"><option value="">all chains</option><!--__CHAINLIST__--></select>
+    <select id="fStatus"><option value="">any status</option><option value="IN_RANGE">in range</option><option value="OUT_RANGE">out of range</option></select>
+    <select id="fProject"><option value="">any dex</option></select>
+    <input id="fSearch" placeholder="search pair / token…">
+  </div>
+  <div class="table-wrap"><table><thead><tr>
+    <th>Pair</th><th>Chain</th><th>Status</th><th>Value</th><th>PnL</th><th>ROI</th>
+    <th>IL</th><th>Fees pend.</th><th>APR</th><th>24h</th><th>Opened</th>
+  </tr></thead><tbody id="posBody"><!--__POSITIONS__--></tbody></table></div>
+
+  <h2 class="section">Krystal vaults held <span class="count" id="vaultCount"></span></h2>
+  <div class="filters"><input id="vSearch" placeholder="search vault name / chain…"></div>
+  <div class="table-wrap"><table><thead><tr>
+    <th>Vault</th><th>Chain</th><th>Vault TVL</th><th>Your value</th><th>Your PnL</th><th>APR</th><th>Risk</th>
+  </tr></thead><tbody id="vaultBody"><!--__VAULTS__--></tbody></table></div>
+
+  <div class="warnbox" id="warnbox"><!--__WARN__--></div>
+
+  <footer>
+    Data: <a href="https://api.krystal.app">api.krystal.app</a> — LP positions via <code>/all/v2/lp/userPositions</code> (all chains),
+    vault holdings via <code>/all/v1/vaults/profile</code>. PnL figures are cumulative and gross. Direct LP and vault shares are
+    non-overlapping (vault-backed positions excluded from the direct list). History accumulates from daily snapshots;
+    Krystal offers no historical API for arbitrary wallets, so charts fill in as snapshots are collected.
+    Static snapshot regenerated daily by an automated cron · not financial advice.
+  </footer>
+</div>
+
+<script>
+/* ===== embedded data (filled at build time by scripts/pnl.py — zero network needed) ===== */
+const EMBED = {
+  snap: __SNAPSHOT_JSON__,
+  hist: __HISTORY_JSON__,
+  tracked: __TRACKED_JSON__
+};
+const CHAINS = [1,10,25,56,100,137,169,250,288,324,1116,42161,43114,534352,59144,81457,8453,42220,8217];
+const CHAIN_NAMES = {1:'Ethereum',10:'Optimism',25:'Cronos',56:'BNB Chain',100:'Gnosis',137:'Polygon',169:'Manta',250:'Fantom',288:'Boba',324:'zkSync Era',1116:'Core',42161:'Arbitrum',43114:'Avalanche',534352:'Scroll',59144:'Linea',81457:'Blast',8453:'Base',42220:'Celo',8217:'Klaytn'};
+const API='https://api.krystal.app';
+const $=id=>document.getElementById(id);
+const fmt=(x,d=2,sign=false)=>{ if(x==null||isNaN(x))return 'n/a'; const v=Number(x); return (sign&&v>0?'+':'')+v.toFixed(d); };
+const money=(x,d=2,sign=false)=> x==null?'n/a':'$'+fmt(x,d,sign);
+const ADDR_RE=/^0x[a-fA-F0-9]{40}$/;
+
+function banner(msg,ok){
+  const b=$('banner'); b.textContent=msg; b.className='banner'+(ok?' ok':''); b.style.display='block';
+}
+function clearBanner(){ const b=$('banner'); b.style.display='none'; }
+
+/* ===== charts (from history series) ===== */
+function drawChart(canvas,series,opts){
+  if(!canvas) return;
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.clientWidth||600,H=canvas.clientHeight||190;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const padL=50,padR=12,padT=14,padB=24;
+  const pts=series.filter(p=>p.v!=null);
+  if(pts.length===0){
+    ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#77778f'; ctx.fillText('no snapshots yet — daily snapshots accumulate here',W/2,H/2);
+    return;
+  }
+  if(pts.length===1){
+    const p=pts[0];
+    ctx.strokeStyle='#2a2a3e'; ctx.setLineDash([5,5]);
+    ctx.beginPath(); ctx.moveTo(padL,H/2-14); ctx.lineTo(W-padR,H/2-14); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle=opts.color+'33'; ctx.beginPath(); ctx.arc(W/2,H/2-14,14,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=opts.color; ctx.beginPath(); ctx.arc(W/2,H/2-14,6,0,Math.PI*2); ctx.fill();
+    ctx.font='bold 16px Consolas,monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#e2e2f0'; ctx.fillText(opts.fmt(p.v),W/2,H/2+14);
+    ctx.font='12px sans-serif'; ctx.fillStyle='#77778f';
+    ctx.fillText('first snapshot '+p.date+' · chart fills in as data accumulates',W/2,H/2+34);
+    return;
+  }
+  const plotW=W-padL-padR,plotH=H-padT-padB;
+  let vals=pts.map(p=>p.v);
+  let min=Math.min(...vals),max=Math.max(...vals);
+  if(opts.zero&&min>0)min=0;
+  if(min===max){min*=.9999;max*=1.0001;}
+  const range=max-min;
+  const X=i=>padL+(i/(pts.length-1))*plotW;
+  const Y=v=>padT+plotH-((v-min)/range)*plotH;
+  ctx.font='10.5px sans-serif'; ctx.textAlign='right'; ctx.textBaseline='middle';
+  for(let i=0;i<=4;i++){
+    const v=max-(range*i/4),y=padT+plotH*i/4;
+    ctx.strokeStyle='#1c1c2a'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke();
+    ctx.fillStyle='#66667e'; ctx.fillText(opts.fmt(v),padL-6,y);
+  }
+  if(opts.zero&&min<0&&max>0){const y=Y(0);ctx.strokeStyle='#44445c';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();ctx.setLineDash([]);}
+  ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillStyle='#66667e';
+  ctx.fillText(pts[0].date,padL,H-padB+7);
+  ctx.textAlign='right'; ctx.fillText(pts[pts.length-1].date,W-padR,H-padB+7);
+  const grad=ctx.createLinearGradient(0,padT,0,H-padB);
+  grad.addColorStop(0,opts.color+'38'); grad.addColorStop(1,opts.color+'02');
+  ctx.beginPath(); ctx.moveTo(X(0),H-padB);
+  pts.forEach((p,i)=>ctx.lineTo(X(i),Y(p.v)));
+  ctx.lineTo(X(pts.length-1),H-padB); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+  ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(X(i),Y(p.v)):ctx.moveTo(X(i),Y(p.v)));
+  ctx.strokeStyle=opts.color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+  const lx=X(pts.length-1),ly=Y(pts[pts.length-1].v);
+  ctx.beginPath(); ctx.arc(lx,ly,3.5,0,Math.PI*2); ctx.fillStyle=opts.color; ctx.fill();
+  ctx.beginPath(); ctx.arc(lx,ly,7,0,Math.PI*2); ctx.strokeStyle=opts.color+'55'; ctx.stroke();
+}
+function seriesOf(hist,key){
+  return (hist||[]).map(h=>({ts:h.ts,date:h.date,v:h[key]})).filter(p=>p.v!=null);
+}
+function renderCharts(hist){
+  $('histCount').textContent=hist.length?hist.length+' snapshots · from '+hist[0].date:'no history yet';
+  drawChart($('chComb'),seriesOf(hist,'combinedValue'),{color:'#00d4aa',fmt:v=>'$'+v.toFixed(0)});
+  drawChart($('chCombPnl'),seriesOf(hist,'combinedPnl'),{color:'#00d4aa',fmt:v=>'$'+v.toFixed(0),zero:true});
+  drawChart($('chLp'),seriesOf(hist,'lpValue'),{color:'#4a9eff',fmt:v=>'$'+v.toFixed(0)});
+  drawChart($('chVlt'),seriesOf(hist,'vaultUserValue'),{color:'#a78bfa',fmt:v=>'$'+v.toFixed(0)});
+}
+
+/* ===== card / chain / table builders (mirror scripts/pnl.py) ===== */
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function deltaHtml(cur,prev,unit){
+  if(cur==null||prev==null)return '';
+  const d=Number(cur)-Number(prev);
+  if(Math.abs(d)<1e-9)return '<div class="delta flat">±0 vs yesterday</div>';
+  const cls=d>0?'up':'down', ar=d>0?'▲':'▼';
+  return '<div class="delta '+cls+'">'+ar+' '+(unit==='$'?Math.abs(d).toFixed(4):Math.abs(d*100).toFixed(2)+'pp')+' vs yesterday</div>';
+}
+function cardHtml(label,val,accent,sub,delta){
+  return '<div class="card"><div class="accent '+accent+'"></div><div class="label">'+label+'</div><div class="val">'+val+'</div>'+(delta||'')+'<div class="delta" style="color:var(--muted)">'+sub+'</div></div>';
+}
+function buildCards(snap,prev){
+  const t=snap.totals,pt=prev?prev.totals:{};
+  const g=k=>t[k];
+  const items=[
+    ['Combined TVL',money(g('combinedValue')),'accent g','LP value + vault shares',g('combinedValue'),pt.combinedValue,'$'],
+    ['Direct LP value',money(g('lpValue')),'accent b',g('openPositions')+' open positions, all chains',g('lpValue'),pt.lpValue,'$'],
+    ['LP PnL',money(g('lpPnl'),4,true),g('lpPnl')>=0?'accent g':'accent r','cumulative, direct LP',g('lpPnl'),pt.lpPnl,'$'],
+    ['Vault share value',money(g('vaultUserValue'),3),'accent p',g('vaultCount')+' vaults held',g('vaultUserValue'),pt.vaultUserValue,'$'],
+    ['Vault PnL',money(g('vaultUserPnl'),4,true),g('vaultUserPnl')>=0?'accent g':'accent r','cumulative, user shares',g('vaultUserPnl'),pt.vaultUserPnl,'$'],
+    ['Combined PnL',money(g('combinedPnl'),4,true),g('combinedPnl')>=0?'accent g':'accent r','LP + vaults',g('combinedPnl'),pt.combinedPnl,'$'],
+    ['Deposited',money((g('lpDeposited')||0)+(g('vaultDeposited')||0)),'accent y','LP '+money(g('lpDeposited'),0)+' + vaults '+money(g('vaultDeposited'),0),null,null,null],
+    ['Unclaimed LP fees',money(g('lpFeesPending'),4),'accent y','pending across open positions',g('lpFeesPending'),pt.lpFeesPending,'$'],
+    ['24h earnings',money(g('lpEarning24h'),4,true),'accent g','LP fee earnings, trailing 24h',g('lpEarning24h'),pt.lpEarning24h,'$'],
+    ['Vault APY',g('vaultApy')==null?'n/a':(g('vaultApy')*100).toFixed(2)+'%','accent p','Krystal vaults, blended',g('vaultApy'),pt.vaultApy,'%'],
+  ];
+  return items.map(i=>cardHtml(i[0],i[1],i[2],i[3],i[4]!=null&&i[6]?deltaHtml(i[4],i[5],i[6]):'')).join('\n    ');
+}
+function buildChains(snap){
+  if(!snap.chains.length)return '<div class="empty">No LP positions found on any chain.</div>';
+  return snap.chains.map(c=>{
+    const cls=c.pnl>=0?'up':'down';
+    const prots=(c.protocols||[]).slice(0,5).map(p=>'<span class="chip">'+esc(p)+'</span>').join('');
+    return '<div class="chain-card"><div class="chain-head"><img src="'+c.logo+'" alt="" onerror="this.style.display=\'none\'"><div><div class="chain-name">'+esc(c.chainName)+'</div><div class="chain-sub">'+c.open+' open · '+c.closed+' closed</div></div><div class="chain-val">'+money(c.value,0)+'</div></div>'
+      +'<div class="chain-row"><span class="k">PnL</span><span class="'+cls+'">'+money(c.pnl,2,true)+'</span></div>'
+      +'<div class="chain-row"><span class="k">Fees earned</span><span>'+money(c.totalFeeEarned,0)+'</span></div>'
+      +'<div class="chain-row"><span class="k">24h</span><span>'+money(c.earning24h,2,true)+'</span></div>'
+      +'<div class="chain-row"><span class="k">APR</span><span>'+(c.apr==null?'n/a':(c.apr*100).toFixed(2)+'%')+'</span></div>'
+      +'<div class="chain-row"><span class="k">ROI</span><span>'+(c.roi==null?'n/a':fmt(c.roi,2,true)+'%')+'</span></div>'
+      +'<div class="chain-prots">'+prots+'</div></div>';
+  }).join('\n    ');
+}
+function posRowHtml(p){
+  const logos=(p.logos||[]).slice(0,2).filter(Boolean).map(l=>'<img src="'+l+'" onerror="this.style.display=\'none\'">').join('');
+  const pnlCls=p.pnl>=0?'up':'down', roiCls=p.roi>=0?'up':'down';
+  const stCls=p.status==='OUT_RANGE'?'st-out':'st-in';
+  const opened=p.opened?new Date(p.opened*1000).toISOString().slice(0,10):'?';
+  const vt=p.vault?'<span class="chip chip-v">vault</span>':'';
+  return '<tr class="pos-row" data-chain="'+p.chainId+'" data-status="'+p.status+'" data-project="'+esc((p.project||'').toLowerCase())+'">'
+    +'<td><div class="pair"><span class="logos">'+logos+'</span><span>'+esc(p.pair)+' '+vt+'</span></div></td>'
+    +'<td>'+esc(p.chainName)+'</td><td><span class="'+stCls+'">'+(p.status==='IN_RANGE'?'IN':'OUT')+'</span></td>'
+    +'<td>'+money(p.value,2)+'</td><td class="'+pnlCls+'">'+money(p.pnl,2,true)+'</td><td class="'+roiCls+'">'+(p.roi==null?'n/a':fmt(p.roi,2,true)+'%')+'</td>'
+    +'<td>'+(p.il==null?'n/a':money(p.il,4,true))+'</td><td>'+money(p.feePending,4)+'</td>'
+    +'<td>'+(p.apr==null?'n/a':(p.apr*100).toFixed(2)+'%')+'</td><td>'+money(p.earning24h,4,true)+'</td><td>'+opened+'</td></tr>';
+}
+function vaultRowHtml(v){
+  const cls=v.userPnl>=0?'up':'down';
+  const risk=v.risk==null?'?':v.risk;
+  const r=String(risk).toUpperCase();
+  const rCls=(r==='HIGH'||r==='CRITICAL'||r==='VERY HIGH')?'r-high':((r==='ELEVATED'||r==='MEDIUM'||r==='MODERATE'||r==='AVERAGE')?'r-mid':'r-low');
+  return '<tr class="vault-row"><td class="vname">'+esc(v.name)+'<div class="vsub">'+esc(String(v.address||'').slice(0,12))+'…</div></td>'
+    +'<td>'+esc(v.chainName)+'</td><td>'+money(v.tvl,0)+'</td><td>'+money(v.userValue,2)+'</td>'
+    +'<td class="'+cls+'">'+money(v.userPnl,2,true)+'</td>'
+    +'<td>'+(v.apr==null?'n/a':(v.apr*100).toFixed(2)+'%')+'</td>'
+    +'<td><span class="risk '+rCls+'">'+esc(risk)+'</span></td></tr>';
+}
+function applyFilters(){
+  const chain=$('fChain').value,status=$('fStatus').value,proj=$('fProject').value,search=$('fSearch').value.toLowerCase();
+  let vis=0;
+  document.querySelectorAll('#posBody .pos-row').forEach(r=>{
+    const ok=(!chain||r.dataset.chain===chain)&&(!status||r.dataset.status===status)
+      &&(!proj||r.dataset.project===proj)&&(!search||r.textContent.toLowerCase().includes(search));
+    r.style.display=ok?'':'none'; if(ok)vis++;
+  });
+  $('posCount').textContent=vis+' of '+document.querySelectorAll('#posBody .pos-row').length+' shown';
+}
+function applyVaultFilter(){
+  const search=$('vSearch').value.toLowerCase();
+  let vis=0;
+  document.querySelectorAll('#vaultBody .vault-row').forEach(r=>{
+    const ok=!search||r.textContent.toLowerCase().includes(search);
+    r.style.display=ok?'':'none'; if(ok)vis++;
+  });
+}
+function fillProjectFilter(snap){
+  const set={};
+  (snap.positions||[]).forEach(p=>set[p.project]=1);
+  const sel=$('fProject');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">any dex</option>'+Object.keys(set).sort().map(p=>'<option value="'+esc(p.toLowerCase())+'">'+esc(p)+'</option>').join('');
+  sel.value=cur;
+}
+
+/* ===== full render (static or live) ===== */
+function renderAll(snap,hist){
+  const prev=(hist&&hist.length>1)?hist[hist.length-2]:null;
+  $('cards').innerHTML=buildCards(snap,prev);
+  $('chains').innerHTML=buildChains(snap);
+  $('posBody').innerHTML=snap.positions.map(posRowHtml).join('\n      ');
+  $('vaultBody').innerHTML=snap.vaults.map(vaultRowHtml).join('\n      ');
+  $('walletAddr').textContent=snap.wallet;
+  $('updated').textContent='updated '+new Date(snap.ts*1000).toISOString().slice(0,16).replace('T',' ')+' UTC';
+  $('fetchLine').textContent=snap.fetchSeconds?('fetched in '+snap.fetchSeconds+'s · '+(snap.chains.length)+' chains with positions'):'';
+  $('cComb').textContent=money(snap.totals.combinedValue);
+  $('cCombPnl').textContent=money(snap.totals.combinedPnl,4,true);
+  $('cLp').textContent=money(snap.totals.lpValue);
+  $('cVlt').textContent=money(snap.totals.vaultUserValue,3);
+  $('posCount').textContent=snap.positions.length+' open';
+  $('vaultCount').textContent=snap.vaults.length+' held';
+  const warns=[];
+  if(snap.totals.combinedPnl<0)warns.push('Net position is currently at a loss.');
+  const errs=Object.keys(snap.errors||{}).length;
+  if(errs)warns.push('Fetch errors on '+errs+' chain(s) — snapshot may be incomplete.');
+  $('warnbox').textContent=warns.join(' ');
+  $('warnbox').style.display=warns.length?'':'none';
+  fillProjectFilter(snap);
+  renderCharts(hist);
+  applyFilters(); applyVaultFilter();
+  $('dot').className='dot'; $('modeBadge').textContent='LIVE';
+}
+
+/* ===== live fetch ===== */
+async function fetchJSON(url){
+  const r=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0'}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+}
+function compactPosition(p){
+  const pool=p.pool||{};
+  const amts=pool.tokenAmounts||[];
+  const syms=amts.map(a=>a.token&&a.token.symbol||'?').slice(0,4);
+  const logos=amts.map(a=>a.token&&a.token.logo||'').slice(0,4);
+  let fees=0;
+  (p.feePending||[]).forEach(q=>{const v=q.quotes&&q.quotes.usd&&q.quotes.usd.value; if(v!=null)fees+=Number(v);});
+  const f=(k,d=null)=>p[k]==null?d:Number(p[k]);
+  return {id:p.id,chainId:p.chainId,chainName:CHAIN_NAMES[p.chainId]||p.chainName||'?',status:p.status,project:pool.project||'?',
+    projectLogo:pool.projectLogo||'',pair:syms.join('/'),logos:logos,tokenId:String(p.tokenId||''),
+    pool:p.tokenAddress||'',value:f('currentPositionValue'),initial:f('totalDepositValue',f('initialUnderlyingValue')),
+    pnl:f('pnl'),roi:f('returnOnInvestment'),il:f('impermanentLoss'),feePending:fees,earning24h:f('earning24h'),
+    apr:f('apr'),opened:p.openedTime||p.createdTime,hodl:f('compareWithHodl'),minP:f('minPrice'),
+    maxP:f('maxPrice'),vault:!!p.vaultOwnerAddress};
+}
+async function fetchSnapshot(addr){
+  const t0=Date.now();
+  const [chainRes,prof,stats]=await Promise.all([
+    Promise.all(CHAINS.map(c=>fetchJSON(API+'/all/v2/lp/userPositions?addresses='+addr+'&walletAddress='+addr+'&chainIds='+c+'&limit=500&positionStatus=open')
+      .then(d=>({c,d})).catch(e=>({c,err:String(e)})))),
+    fetchJSON(API+'/all/v1/vaults/profile?userAddress='+addr+'&perPage=500').catch(e=>null),
+    fetchJSON(API+'/all/v1/vaults/profile/stats?userAddress='+addr).catch(e=>null)
+  ]);
+  /* the vaults endpoints are flaky (varying item counts / zeroed stats) — one retry, keep the better response */
+  let prof2=null,stats2=null;
+  try{prof2=await fetchJSON(API+'/all/v1/vaults/profile?userAddress='+addr+'&perPage=500');}catch(e){}
+  try{stats2=await fetchJSON(API+'/all/v1/vaults/profile/stats?userAddress='+addr);}catch(e){}
+  const bestProf=(prof2&&(prof2.data||[]).length>(prof&&prof.data||[]).length)?prof2:(prof||prof2);
+  const bestStats=(stats2&&(stats2.userShareValue||0)>(stats&&stats.userShareValue||0))?stats2:(stats||stats2);
+  const errors={};
+  const chains=[],positions=[];
+  chainRes.forEach(({c,d,err})=>{
+    if(err){errors[c]=err;return;}
+    const s=(d.statsByChain||{}).all||{};
+    if(!(s.openPositionCount||s.closedPositionCount))return;
+    const f=k=>s[k]==null?null:Number(s[k]);
+    chains.push({chainId:c,chainName:CHAIN_NAMES[c]||'?',logo:'https://files.krystal.app/DesignAssets/chains/'+(s.chainName||'')+'.png',
+      open:s.openPositionCount||0,closed:s.closedPositionCount||0,value:f('currentPositionValue'),pnl:f('pnl'),
+      unclaimedFees:f('unclaimedFees'),earning24h:f('earning24h'),totalFeeEarned:f('totalFeeEarned'),apr:f('apr'),
+      roi:f('returnOnInvestment'),protocols:s.protocols||[]});
+    (d.positions||[]).forEach(p=>positions.push(compactPosition(p)));
+  });
+  chains.sort((a,b)=>b.open-a.open);
+  const vaults=[];
+  (bestProf&&bestProf.data||[]).forEach(v=>{
+    const up=v.userPerformance||{};
+    if(!up||up.value==null)return;
+    const f=k=>v[k]==null?null:Number(v[k]);
+    vaults.push({name:v.name||'Untitled vault',address:v.vaultAddress,chainId:v.chainId,chainName:v.chainName||CHAIN_NAMES[v.chainId]||'?',
+      chainLogo:v.chainLogo||'',tvl:f('tvl'),pnl:f('pnl'),lpValue:f('lpValue'),apr:f('apr'),feeApr:f('feeApr'),farmApr:f('farmApr'),
+      risk:v.riskScore,vaultType:v.vaultType,owner:v.ownerAddress,created:v.createdBlockTime,
+      userValue:up.value==null?null:Number(up.value),userPnl:up.pnlUsd==null?null:Number(up.pnlUsd),
+      userShares:up.shares==null?null:Number(up.shares),userDeposit:up.totalDepositValue==null?null:Number(up.totalDepositValue)});
+  });
+  const f=k=>bestStats&&bestStats[k]!=null?Number(bestStats[k]):null;
+  const lpValue=positions.reduce((s,p)=>s+(p.value||0),0);
+  const lpPnl=positions.reduce((s,p)=>s+(p.pnl||0),0);
+  const lpDeposited=positions.reduce((s,p)=>s+(p.initial||0),0);
+  const lpFees=positions.reduce((s,p)=>s+(p.feePending||0),0);
+  const vaultValue=vaults.reduce((s,v)=>s+(v.userValue||0),0);
+  const vaultPnl=vaults.reduce((s,v)=>s+(v.userPnl||0),0);
+  const vaultDep=vaults.reduce((s,v)=>s+(v.userDeposit||0),0);
+  let usv=vaultValue;
+  if(!vaults.length&&f('userShareValue')&&f('totalJoinedVault')){usv=f('userShareValue');errors.vaults='vault profile returned no rows; using stats aggregate';}
+  let dep=vaultDep; if(!dep)dep=f('depositedValue');
+  const expected=chains.reduce((s,c)=>s+(c.open||0),0);
+  if(expected!==positions.length)errors.positionCount='expected '+expected+' open positions, got '+positions.length;
+  return {
+    ts:Math.floor(Date.now()/1000),date:new Date().toISOString().slice(0,10),wallet:addr.toLowerCase(),
+    owner:bestStats&&bestStats.owner&&bestStats.owner.twitterUsername||null,
+    totals:{lpValue:lpValue,lpPnl:lpPnl,lpDeposited:lpDeposited,lpFeesPending:lpFees,
+      lpEarning24h:positions.reduce((s,p)=>s+(p.earning24h||0),0),openPositions:positions.length,
+      vaultCount:vaults.length,vaultUserValue:usv,vaultUserPnl:vaultPnl,vaultDeposited:dep,
+      vaultApy:f('apy'),vaultDailyYield:f('dailyYield'),combinedValue:lpValue+usv,combinedPnl:lpPnl+vaultPnl},
+    chains:chains,positions:positions,vaults:vaults,fetchSeconds:((Date.now()-t0)/1000),errors:errors
+  };
+}
+async function loadAddress(addr){
+  addr=addr.trim().toLowerCase();
+  if(!ADDR_RE.test(addr)){banner('Invalid address — expected 0x followed by 40 hex characters.');return;}
+  const btn=$('loadBtn'); btn.disabled=true; btn.textContent='Loading…'; clearBanner();
+  try{
+    const snap=await fetchSnapshot(addr);
+    let hist=EMBED.hist.filter(h=>h.wallet===addr);
+    if(!hist.length){
+      try{
+        const r=await fetch('data/wallets/'+addr+'.json?ts='+Date.now());
+        if(r.ok){const full=await r.json();hist=(full||[]).map(h=>({ts:h.ts,date:h.date,...(h.totals||{})}));}
+      }catch(e){}
+    }
+    if(hist.length&&hist[hist.length-1].date===snap.date){hist[hist.length-1]=snap;}
+    else{hist=hist.concat([snap]);}
+    renderAll(snap,hist);
+    try{history.replaceState(null,'','?address='+addr);}catch(e){}
+    banner('Live data for '+addr+' · fetched directly from api.krystal.app (CORS open) · '+snap.positions.length+' open LP positions',true);
+  }catch(e){
+    banner('Live fetch failed ('+e.message+'). Showing the last statically-rendered snapshot for '+EMBED.snap.wallet+'. In restricted networks, run scripts/pnl.py locally to generate a page for any address.');
+    $('dot').className='dot err';
+  }finally{
+    btn.disabled=false; btn.textContent='Load';
+  }
+}
+
+/* ===== init ===== */
+function initStatic(){
+  if(!EMBED.snap){banner('Page not generated yet — run scripts/pnl.py <address> and redeploy.');return;}
+  $('walletAddr').textContent=EMBED.snap.wallet;
+  const l=EMBED.hist[EMBED.hist.length-1]||EMBED.snap;
+  $('cComb').textContent=money(l.combinedValue);
+  $('cCombPnl').textContent=money(l.combinedPnl,4,true);
+  $('cLp').textContent=money(l.lpValue);
+  $('cVlt').textContent=money(l.vaultUserValue,3);
+  $('posCount').textContent=EMBED.snap.positions.length+' open';
+  $('vaultCount').textContent=EMBED.snap.vaults.length+' held';
+  renderCharts(EMBED.hist);
+  applyFilters(); applyVaultFilter();
+  const errs=Object.keys(EMBED.snap.errors||{}).length;
+  if(errs){$('warnbox').style.display='';$('warnbox').textContent='Fetch errors on '+errs+' chain(s) during last render.';}
+}
+function init(){
+  $('loadBtn').addEventListener('click',()=>loadAddress($('addrInput').value));
+  $('addrInput').addEventListener('keydown',e=>{if(e.key==='Enter')loadAddress($('addrInput').value);});
+  ['fChain','fStatus','fProject'].forEach(id=>$(id).addEventListener('change',applyFilters));
+  $('fSearch').addEventListener('input',applyFilters);
+  $('vSearch').addEventListener('input',applyVaultFilter);
+  if(EMBED.tracked&&EMBED.tracked.length){
+    $('trackedList').innerHTML=EMBED.tracked.map(t=>'<option value="'+t.address+'">'+t.address.slice(0,12)+'… · '+t.last+' · '+t.snapshots+' snapshots</option>').join('');
+  }
+  try{
+    const p=new URLSearchParams(location.search).get('address');
+    if(p&&ADDR_RE.test(p)){loadAddress(p);return;}
+  }catch(e){}
+  initStatic();
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+</script>
+</body>
+</html>
