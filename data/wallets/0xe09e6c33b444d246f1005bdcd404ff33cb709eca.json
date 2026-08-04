@@ -1,6 +1,6 @@
 [
  {
-  "ts": 1785809408,
+  "ts": 1785809674,
   "date": "2026-08-04",
   "wallet": "0xe09e6c33b444d246f1005bdcd404ff33cb709eca",
   "owner": null,
@@ -12,13 +12,13 @@
    "lpEarning24h": 0.225896,
    "openPositions": 8,
    "vaultCount": 2,
-   "vaultUserValue": 203.363331,
-   "vaultUserPnl": 3.540352,
+   "vaultUserValue": 203.405632,
+   "vaultUserPnl": 3.582653,
    "vaultDeposited": 199.822979059398,
-   "vaultApy": 0.09862245723334791,
-   "vaultDailyYield": 0.10724161107854965,
-   "combinedValue": 2144.587006,
-   "combinedPnl": 387.031819
+   "vaultApy": 0.09915116354520717,
+   "vaultDailyYield": 0.10786417556530173,
+   "combinedValue": 2144.629307,
+   "combinedPnl": 387.07412
   },
   "chains": [
    {
@@ -305,8 +305,8 @@
     "chainId": 56,
     "chainName": "BSC",
     "chainLogo": "https://files.krystal.app/DesignAssets/chains/bsc.png",
-    "tvl": 109.92264459311181,
-    "pnl": 0.07938753813505173,
+    "tvl": 109.96919084076366,
+    "pnl": 0.12593378126621246,
     "lpValue": 0.0,
     "apr": 0.10150238126516342,
     "feeApr": 0.10150238110907238,
@@ -315,8 +315,8 @@
     "vaultType": "vaultx",
     "owner": "",
     "created": 1785652095,
-    "userValue": 99.89655920253384,
-    "userPnl": 0.07358014313582828,
+    "userValue": 99.93885994958573,
+    "userPnl": 0.11588089018772507,
     "userShares": 0.9087896272174819,
     "userDeposit": 99.82297905939801
    },
@@ -342,7 +342,7 @@
     "userDeposit": 100.0
    }
   ],
-  "fetchSeconds": 8.4,
+  "fetchSeconds": 8.5,
   "errors": {}
  }
 ]
