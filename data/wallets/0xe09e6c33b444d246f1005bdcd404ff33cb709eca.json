@@ -4619,7 +4619,7 @@
   "errors": {}
  },
  {
-  "ts": 1787714513,
+  "ts": 1787761142,
   "date": "2026-08-26",
   "wallet": "0xe09e6c33b444d246f1005bdcd404ff33cb709eca",
   "owner": null,
@@ -4631,13 +4631,13 @@
    "lpEarning24h": 0.213082,
    "openPositions": 8,
    "vaultCount": 1,
-   "vaultUserValue": 104.243482,
-   "vaultUserPnl": 4.243482,
+   "vaultUserValue": 104.403372,
+   "vaultUserPnl": 4.403372,
    "vaultDeposited": 100.0,
-   "vaultApy": 0.28676500172326047,
-   "vaultDailyYield": 0.25714005214295155,
-   "combinedValue": 2076.934074,
-   "combinedPnl": 431.548059
+   "vaultApy": 0.32656933143891165,
+   "vaultDailyYield": 0.29270279913494107,
+   "combinedValue": 2077.093963,
+   "combinedPnl": 431.707949
   },
   "chains": [
    {
@@ -4699,7 +4699,7 @@
     "chainName": "BNB Chain",
     "status": "IN_RANGE",
     "project": "Uniswap V3",
-    "projectLogo": "https://storage.googleapis.com/k-assets-dev.krystal.team/web3-protocol/uniswap.png",
+    "projectLogo": "https://k-assets-dev.krystal.team/web3-protocol/uniswap.png",
     "pair": "ZEC/USDT",
     "logos": [
      "https://storage.googleapis.com/k-assets-prod.krystal.team/krystal/binance-peg-zcash-token.png",
@@ -4714,7 +4714,7 @@
     "il": -13.145662998402258,
     "feePending": 0.013516397633664424,
     "earning24h": 0.20959330185944391,
-    "apr": 0.5808163413731982,
+    "apr": 0.5954000901886036,
     "opened": 1776299366,
     "hodl": 102.47075940667204,
     "minP": 41.5049921353042,
@@ -4727,7 +4727,7 @@
     "chainName": "BNB Chain",
     "status": "OUT_RANGE",
     "project": "Uniswap V3",
-    "projectLogo": "https://storage.googleapis.com/k-assets-dev.krystal.team/web3-protocol/uniswap.png",
+    "projectLogo": "https://k-assets-dev.krystal.team/web3-protocol/uniswap.png",
     "pair": "USDT/TWON",
     "logos": [
      "https://storage.googleapis.com/k-assets-prod.krystal.team/krystal/tether.png",
@@ -4755,7 +4755,7 @@
     "chainName": "BNB Chain",
     "status": "IN_RANGE",
     "project": "Uniswap V4",
-    "projectLogo": "https://storage.googleapis.com/k-assets-dev.krystal.team/web3-protocol/uniswap.png",
+    "projectLogo": "https://k-assets-dev.krystal.team/web3-protocol/uniswap.png",
     "pair": "ZEC/USDC",
     "logos": [
      "https://storage.googleapis.com/k-assets-prod.krystal.team/krystal/binance-peg-zcash-token.png",
@@ -4770,7 +4770,7 @@
     "il": -0.2948473509634084,
     "feePending": 0.32002775565929037,
     "earning24h": 0.0,
-    "apr": 0.6054069502764327,
+    "apr": 0.6131814764626221,
     "opened": 1780398944,
     "hodl": 0.025180404695881953,
     "minP": 107.74485900541144,
@@ -4783,7 +4783,7 @@
     "chainName": "BNB Chain",
     "status": "IN_RANGE",
     "project": "PancakeSwap V3",
-    "projectLogo": "https://storage.googleapis.com/k-assets-dev.krystal.team/web3-protocol/pancakeswap.png",
+    "projectLogo": "https://k-assets-dev.krystal.team/web3-protocol/pancakeswap.png",
     "pair": "ZEC/BTCB",
     "logos": [
      "https://storage.googleapis.com/k-assets-prod.krystal.team/krystal/binance-peg-zcash-token.png",
@@ -4798,7 +4798,7 @@
     "il": -0.04398462750152632,
     "feePending": 0.8255572553746068,
     "earning24h": 0.003488497829166594,
-    "apr": 0.6109252388550994,
+    "apr": 0.6232131154889923,
     "opened": 1780399128,
     "hodl": 1.8214435836772376,
     "minP": 0.003264287482273392,
@@ -4925,23 +4925,23 @@
     "chainId": 56,
     "chainName": "BSC",
     "chainLogo": "https://files.krystal.app/DesignAssets/chains/bsc.png",
-    "tvl": 691.4606716760919,
-    "pnl": 44.74340057373047,
+    "tvl": 692.5212384242741,
+    "pnl": 45.823604583740234,
     "lpValue": 0.0,
-    "apr": 0.19228625297546387,
-    "feeApr": 0.1922862555433749,
+    "apr": 0.21907995641231537,
+    "feeApr": 0.21907995553971277,
     "farmApr": 0.0,
     "risk": "MEDIUM",
     "vaultType": "sharevault",
     "owner": "",
     "created": 1756159585,
-    "userValue": 104.24348218937597,
-    "userPnl": 4.2434821893759676,
+    "userValue": 104.40337150116687,
+    "userPnl": 4.403371501166873,
     "userShares": 0.1507583676981817,
     "userDeposit": 100.0
    }
   ],
-  "fetchSeconds": 10.0,
+  "fetchSeconds": 8.3,
   "errors": {}
  }
 ]
