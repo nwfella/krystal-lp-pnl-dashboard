@@ -11139,7 +11139,7 @@
   "errors": {}
  },
  {
-  "ts": 1790059830,
+  "ts": 1790098573,
   "date": "2026-09-22",
   "wallet": "0xe09e6c33b444d246f1005bdcd404ff33cb709eca",
   "owner": null,
@@ -11151,13 +11151,13 @@
    "lpEarning24h": 0.213082,
    "openPositions": 8,
    "vaultCount": 1,
-   "vaultUserValue": 107.21995,
-   "vaultUserPnl": 7.21995,
+   "vaultUserValue": 107.201212,
+   "vaultUserPnl": 7.201212,
    "vaultDeposited": 100.0,
-   "vaultApy": 0.08722836170669454,
-   "vaultDailyYield": 0.0837866219032453,
-   "combinedValue": 2079.910542,
-   "combinedPnl": 434.524527
+   "vaultApy": 0.11773556904589953,
+   "vaultDailyYield": 0.11350182805982617,
+   "combinedValue": 2079.891804,
+   "combinedPnl": 434.50579
   },
   "chains": [
    {
@@ -11234,7 +11234,7 @@
     "il": -13.145662998402258,
     "feePending": 0.013516397633664424,
     "earning24h": 0.20959330185944391,
-    "apr": 0.553249718371329,
+    "apr": 0.560303419133212,
     "opened": 1776299366,
     "hodl": 102.47075940667204,
     "minP": 41.5049921353042,
@@ -11290,7 +11290,7 @@
     "il": -0.2948473509634084,
     "feePending": 0.32002775565929037,
     "earning24h": 0.0,
-    "apr": 0.15153798660142095,
+    "apr": 0.13771018652430664,
     "opened": 1780398944,
     "hodl": 0.025180404695881953,
     "minP": 107.74485900541144,
@@ -11318,7 +11318,7 @@
     "il": -0.04398462750152632,
     "feePending": 0.8255572553746068,
     "earning24h": 0.003488497829166594,
-    "apr": 0.012500876698780207,
+    "apr": 0.008994335697652452,
     "opened": 1780399128,
     "hodl": 1.8214435836772376,
     "minP": 0.003264287482273392,
@@ -11445,23 +11445,23 @@
     "chainId": 56,
     "chainName": "BSC",
     "chainLogo": "https://files.krystal.app/DesignAssets/chains/bsc.png",
-    "tvl": 680.7684522504469,
-    "pnl": 66.23404693603516,
+    "tvl": 457.1485458087314,
+    "pnl": 66.17147827148438,
     "lpValue": 0.0,
-    "apr": 0.29611411690711975,
-    "feeApr": 0.2961141182972373,
+    "apr": 0.3033541440963745,
+    "feeApr": 0.3033541461941585,
     "farmApr": 0.0,
     "risk": "MEDIUM",
     "vaultType": "sharevault",
     "owner": "",
     "created": 1756159585,
-    "userValue": 107.21995023289061,
-    "userPnl": 7.219950232890611,
-    "userShares": 0.15749841209364035,
+    "userValue": 107.20121242050446,
+    "userPnl": 7.201212420504461,
+    "userShares": 0.2344997340653401,
     "userDeposit": 100.0
    }
   ],
-  "fetchSeconds": 18.9,
+  "fetchSeconds": 14.2,
   "errors": {}
  }
 ]
